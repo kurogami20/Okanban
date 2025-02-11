@@ -28,7 +28,7 @@ INSERT INTO "tag" ("name") VALUES
 -- Insertion des cartes
 INSERT INTO "card" ("name", "id_list", "content", "color","position") VALUES
 ('Faire les courses', 1, 'Acheter des fruits et légumes', '#FF5733',0),
-('Réunion équipe', 2, 'Préparer la présentation du projet', '#33FF57',0),
+('Réunion équipe', 1, 'Préparer la présentation du projet', '#33FF57',1),
 ('Lecture livre', 3, 'Finir le chapitre 3 du livre de développement', '#3357FF',0),
 ('Rendez-vous médecin', 4, 'Consultation annuelle', '#FF33F6',0),
 ('Payer les factures', 5, 'Électricité et internet', '#33FFF6',0),
