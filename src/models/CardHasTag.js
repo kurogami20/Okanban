@@ -1,17 +1,17 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../data/connect.js";
 
-class List extends Model {}
+class CardHasTag extends Model {}
 
-List.init(
+CardHasTag.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: DataTypes.TEXT, allowNull: false },
-    position: { type: DataTypes.INTEGER },
+    id_card: { type: DataTypes.INTEGER, allowNull: false },
+    id_tag: { type: DataTypes.INTEGER, allowNull: false },
   },
   {
     sequelize,
-    tableName: "list",
+    tableName: "card_has_tag",
 
     timestamps: true,
 
@@ -21,4 +21,4 @@ List.init(
   }
 );
 
-export default List;
+export default CardHasTag;

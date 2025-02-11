@@ -9,8 +9,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --watch index.js",
-    "syncTable": "node data/syncTable.js",
-    "dropTable": "node data/dropTable.js"
+    "db:create": "node src/migrations/01.createTables.js",
+    "db:seed": "node src/migrations/02.seedTables.js",
+    "db:delete": "node src/migrations/03.dropTables.js"
   },
   "keywords": [],
   "author": "",

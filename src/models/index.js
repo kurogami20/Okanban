@@ -1,6 +1,7 @@
 import Card from "./Card.js";
 import List from "./List.js";
 import Tag from "./Tag.js";
+import CardHasTag from "./CardHasTag.js";
 
 // association card/list
 List.hasMany(Card, { foreignKey: "id_list", onDelete: "cascade", as: "card" });
@@ -11,7 +12,7 @@ Card.belongsTo(List, {
 });
 
 Card.belongsToMany(Tag, {
-  through: "card_has_tag",
+  through: CardHasTag,
 
   foreignKey: "id_card",
   onDelete: "cascade",
@@ -20,7 +21,7 @@ Card.belongsToMany(Tag, {
 });
 
 Tag.belongsToMany(Card, {
-  through: "card_has_tag",
+  through: CardHasTag,
 
   foreignKey: "id_tag",
   onDelete: "cascade",
@@ -28,4 +29,4 @@ Tag.belongsToMany(Card, {
   as: "tag",
 });
 
-export { Card, List, Tag };
+export { Card, List, Tag, CardHasTag };
