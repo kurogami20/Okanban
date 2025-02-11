@@ -1,16 +1,16 @@
 BEGIN;
 -- Insertion des listes
-INSERT INTO "list" ("name") VALUES
-('Tâches Quotidiennes'),
-('Projets en Cours'),
-('Idées'),
-('En Attente'),
-('Terminé'),
-('Personnel'),
-('Professionnel'),
-('Courses'),
-('Lecture'),
-('Long Terme');
+INSERT INTO "list" ("name","position") VALUES
+('Tâches Quotidiennes',1),
+('Projets en Cours',2),
+('Idées',3),
+('En Attente',4),
+('Terminé',5),
+('Personnel',6),
+('Professionnel',7),
+('Courses',8),
+('Lecture',9),
+('Long Terme',10);
 
 -- Insertion des tags
 INSERT INTO "tag" ("name") VALUES
@@ -26,17 +26,17 @@ INSERT INTO "tag" ("name") VALUES
 ('Projet');
 
 -- Insertion des cartes
-INSERT INTO "card" ("name", "id_list", "content", "color") VALUES
-('Faire les courses', 1, 'Acheter des fruits et légumes', '#FF5733'),
-('Réunion équipe', 2, 'Préparer la présentation du projet', '#33FF57'),
-('Lecture livre', 3, 'Finir le chapitre 3 du livre de développement', '#3357FF'),
-('Rendez-vous médecin', 4, 'Consultation annuelle', '#FF33F6'),
-('Payer les factures', 5, 'Électricité et internet', '#33FFF6'),
-('Appeler maman', 6, 'Prendre des nouvelles', '#FFB533'),
-('Réviser SQL', 7, 'Pratiquer les requêtes complexes', '#B533FF'),
-('Maintenance voiture', 8, 'Vidange à faire', '#33FFB5'),
-('Plan weekend', 9, 'Organiser sortie en famille', '#FF3333'),
-('Projet personnel', 10, 'Travailler sur l''application web', '#3333FF');
+INSERT INTO "card" ("name", "id_list", "content", "color","position") VALUES
+('Faire les courses', 1, 'Acheter des fruits et légumes', '#FF5733',1),
+('Réunion équipe', 2, 'Préparer la présentation du projet', '#33FF57',1),
+('Lecture livre', 3, 'Finir le chapitre 3 du livre de développement', '#3357FF',1),
+('Rendez-vous médecin', 4, 'Consultation annuelle', '#FF33F6',1),
+('Payer les factures', 5, 'Électricité et internet', '#33FFF6',1),
+('Appeler maman', 6, 'Prendre des nouvelles', '#FFB533',1),
+('Réviser SQL', 7, 'Pratiquer les requêtes complexes', '#B533FF',1),
+('Maintenance voiture', 8, 'Vidange à faire', '#33FFB5',1),
+('Plan weekend', 9, 'Organiser sortie en famille', '#FF3333',1),
+('Projet personnel', 10, 'Travailler sur l''application web', '#3333FF',1);
 
 -- Association des tags aux cartes
 INSERT INTO "card_has_tag" ("id_card", "id_tag") VALUES
