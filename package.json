@@ -1,0 +1,23 @@
+{
+  "name": "s12-okanban-api-kurogami20",
+  "version": "1.0.0",
+  "description": "- JOUR 1 - API   - [E01 - Architecture Client-Server](./docs/cours/E01.md)   - [C01 - Gestion de projet & Modélisation](./docs/challenges/C01.md)",
+  "main": "api.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "sequelize": "^6.37.5",
+    "sqlite3": "^5.1.7"
+  }
+}
