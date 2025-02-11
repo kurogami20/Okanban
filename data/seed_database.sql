@@ -1,59 +1,55 @@
 BEGIN;
-
 -- Insertion des listes
 INSERT INTO "list" ("name") VALUES
-('Projets en cours'),
-('À faire'),
-('En attente'),
-('En développement'),
-('Tests'),
-('Documentation'),
-('Maintenance'),
+('Tâches Quotidiennes'),
+('Projets en Cours'),
 ('Idées'),
-('Archivé'),
-('Urgent');
-
--- Insertion des cartes
-INSERT INTO "card" ("name", "id_list", "color") VALUES
-('Mise à jour du site web', 1, '#FF5733'),
-('Correction de bugs', 2, '#33FF57'),
-('Réunion client', 3, '#3357FF'),
-('Développement API', 4, '#FF33F6'),
-('Tests unitaires', 5, '#33FFF6'),
-('Rédaction documentation', 6, '#F6FF33'),
-('Optimisation base de données', 7, '#FF8033'),
-('Brainstorming nouvelles fonctionnalités', 8, '#33FF80'),
-('Ancien projet X', 9, '#8033FF'),
-('Problème critique serveur', 10, '#FF3333');
+('En Attente'),
+('Terminé'),
+('Personnel'),
+('Professionnel'),
+('Courses'),
+('Lecture'),
+('Long Terme');
 
 -- Insertion des tags
 INSERT INTO "tag" ("name") VALUES
 ('Urgent'),
-('Bug'),
-('Feature'),
-('Documentation'),
-('Backend'),
-('Frontend'),
-('Design'),
-('Testing'),
-('Performance'),
-('Security');
+('Important'),
+('Personnel'),
+('Travail'),
+('Famille'),
+('Santé'),
+('Loisirs'),
+('Finance'),
+('Formation'),
+('Projet');
+
+-- Insertion des cartes
+INSERT INTO "card" ("name", "id_list", "content", "color") VALUES
+('Faire les courses', 1, 'Acheter des fruits et légumes', '#FF5733'),
+('Réunion équipe', 2, 'Préparer la présentation du projet', '#33FF57'),
+('Lecture livre', 3, 'Finir le chapitre 3 du livre de développement', '#3357FF'),
+('Rendez-vous médecin', 4, 'Consultation annuelle', '#FF33F6'),
+('Payer les factures', 5, 'Électricité et internet', '#33FFF6'),
+('Appeler maman', 6, 'Prendre des nouvelles', '#FFB533'),
+('Réviser SQL', 7, 'Pratiquer les requêtes complexes', '#B533FF'),
+('Maintenance voiture', 8, 'Vidange à faire', '#33FFB5'),
+('Plan weekend', 9, 'Organiser sortie en famille', '#FF3333'),
+('Projet personnel', 10, 'Travailler sur l''application web', '#3333FF');
 
 -- Association des tags aux cartes
 INSERT INTO "card_has_tag" ("id_card", "id_tag") VALUES
-(1, 6), -- Mise à jour du site web - Frontend
-(1, 7), -- Mise à jour du site web - Design
-(2, 2), -- Correction de bugs - Bug
-(2, 1), -- Correction de bugs - Urgent
-(3, 3), -- Réunion client - Feature
-(4, 5), -- Développement API - Backend
-(5, 8), -- Tests unitaires - Testing
-(6, 4), -- Rédaction documentation - Documentation
-(7, 9), -- Optimisation base de données - Performance
-(8, 3), -- Brainstorming - Feature
-(9, 4), -- Ancien projet X - Documentation
-(10, 1), -- Problème critique - Urgent
-(10, 10); -- Problème critique - Security
+(1, 1), -- Courses - Urgent
+(1, 3), -- Courses - Personnel
+(2, 4), -- Réunion - Travail
+(2, 1), -- Réunion - Urgent
+(3, 9), -- Lecture - Formation
+(4, 6), -- Rendez-vous médecin - Santé
+(5, 8), -- Factures - Finance
+(6, 3), -- Appeler maman - Personnel
+(7, 9), -- Réviser SQL - Formation
+(8, 1); -- Maintenance voiture - Urgent
 
 COMMIT;
 
