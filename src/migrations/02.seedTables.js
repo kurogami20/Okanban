@@ -132,3 +132,4 @@ async function seedTables() {
 }
 
 seedTables();
+await sequelize.close();
