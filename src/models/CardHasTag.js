@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import sequelize from "../../data/connect.js";
+import sequelize from "../../data/sequelize.js";
 
 class CardHasTag extends Model {}
 
