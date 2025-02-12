@@ -6,7 +6,7 @@ const cardController = {
   async Getcard(req, res) {
     try {
       const allCard = await Card.findAll({
-        order: [["id"]],
+        order: [["id_list"]],
         include: [
           {
             association: "list",
@@ -61,17 +61,13 @@ const cardController = {
     } else {
       // do something
       try {
-        const listCardPosition = await List.findByPk(newCard.id_list, {
-          attributes: [],
-          include: [
-            {
-              association: "card",
-            },
-          ],
+        const listCardPosition = await Card.max("position", {
+          where: { id_list: newCard.id_list },
         });
 
         await Card.create({
           ...newCard,
+          position: listCardPosition + 1,
         });
         // on vérifie si un tag a été associé
         if (newCard.tag !== undefined || "") {
@@ -96,9 +92,10 @@ const cardController = {
       content: z.string().optional(),
       color: z.string().max(7).optional(),
       tag: z.number().optional(),
+      position: z.number().optional(),
     });
     const newCard = req.body;
-    const id = req.params.id;
+    const id = Number.parseInt(req.params.id);
     const test = cardSchema.safeParse(newCard);
 
     if (!test.success) {
@@ -107,27 +104,72 @@ const cardController = {
     } else {
       // do something
       try {
-        await Card.update(
-          {
-            ...newCard,
-          },
-          {
-            where: { id: id },
-          }
-        );
-        // on vérifie si un tag n'a  pas été associé
-        if (newCard.tag === undefined || "") {
-          await CardHasTag.destroy({
-            where: { id_card: id },
-          });
-        } else {
-          await CardHasTag.update(
+        const positionBase = await Card.findByPk(id, {
+          attributes: ["position"],
+        });
+
+        if (
+          newCard.position !== positionBase ||
+          newCard.position === undefined
+        ) {
+          // on met à jour avec la nouvelle position
+          await Card.update(
             {
-              id_tag: newCard.tag,
+              ...newCard,
             },
             {
-              where: { id_card: id },
+              where: { id: id },
             }
+          );
+          // on vérifie si un tag n'a  pas été associé
+          if (newCard.tag === undefined || "") {
+            await CardHasTag.destroy({
+              where: { id_card: id },
+            });
+          } else {
+            await CardHasTag.update(
+              {
+                id_tag: newCard.tag,
+              },
+              {
+                where: { id_card: id },
+              }
+            );
+          }
+          const listCardPosition = await Card.max("position", {
+            where: { id_list: newCard.id_list },
+          });
+          await Card.increment(
+            {
+              position: 1,
+            },
+            {
+              where: {
+                position: {
+                  [Op.between]: [newCard.position, listCardPosition],
+                },
+              },
+            }
+          );
+
+          await Card.increment(
+            {
+              position: -1,
+            },
+            {
+              where: {
+                id: id,
+              },
+            }
+          );
+        } else {
+          // on met à jour avec l'ancienne position
+          await Card.update(
+            {
+              name,
+              position: positionBase,
+            },
+            { where: { id: id } }
           );
         }
       } catch (error) {
