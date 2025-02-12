@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { Card, CardHasTag, Tag } from "../models/index.js";
+import { Card, CardHasTag, Tag, List } from "../models/index.js";
 import z from "zod";
 
 const cardController = {
@@ -61,6 +61,15 @@ const cardController = {
     } else {
       // do something
       try {
+        const listCardPosition = await List.findByPk(newCard.id_list, {
+          attributes: [],
+          include: [
+            {
+              association: "card",
+            },
+          ],
+        });
+
         await Card.create({
           ...newCard,
         });
@@ -80,7 +89,54 @@ const cardController = {
       }
     }
   },
-  Modifycard(req, res) {},
+  async Modifycard(req, res) {
+    const cardSchema = z.object({
+      id_list: z.number().min(1),
+      name: z.string().min(1),
+      content: z.string().optional(),
+      color: z.string().max(7).optional(),
+      tag: z.number().optional(),
+    });
+    const newCard = req.body;
+    const id = req.params.id;
+    const test = cardSchema.safeParse(newCard);
+
+    if (!test.success) {
+      // handle error then return
+      test.error;
+    } else {
+      // do something
+      try {
+        await Card.update(
+          {
+            ...newCard,
+          },
+          {
+            where: { id: id },
+          }
+        );
+        // on vérifie si un tag n'a  pas été associé
+        if (newCard.tag === undefined || "") {
+          await CardHasTag.destroy({
+            where: { id_card: id },
+          });
+        } else {
+          await CardHasTag.update(
+            {
+              id_tag: newCard.tag,
+            },
+            {
+              where: { id_card: id },
+            }
+          );
+        }
+      } catch (error) {
+        res
+          .status(500)
+          .send(error, console.log("Problème d'affichage des cartes"));
+      }
+    }
+  },
   Deletecard(req, res) {},
 };
 
