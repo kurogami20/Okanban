@@ -179,7 +179,49 @@ const cardController = {
       }
     }
   },
-  Deletecard(req, res) {},
+  async Deletecard(req, res) {
+    const id = Number.parseInt(req.params.id);
+    const card = await Card.findByPk(id);
+    try {
+      // on recup la position maximale
+      const maxPos = await Card.max("position", {
+        where: { id_list: card.id_list },
+      });
+      //   on récupère la position de la liste a supp
+      const positionToDel = await Card.findByPk(id, {
+        attributes: ["position"],
+      });
+      // si la position à supp = position max
+      //   alors pas besoin de réduire les position des autres liste
+      if (positionToDel === maxPos) {
+        await Card.destroy({
+          where: {
+            id: id,
+          },
+        });
+      } else {
+        await Card.increment(
+          {
+            position: -1,
+          },
+          {
+            where: {
+              id: { [Op.ne]: id },
+            },
+          }
+        );
+        await Card.destroy({
+          where: {
+            id: id,
+          },
+        });
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .send(error, console.log("Problème d'affichage des listes"));
+    }
+  },
 };
 
 export default cardController;
