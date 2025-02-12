@@ -117,6 +117,47 @@ const listController = {
       }
     }
   },
+
+  async DeleteList(req, res) {
+    const id = Number.parseInt(req.params.id);
+    try {
+      // on recup la position maximale
+      const maxPos = await List.max("position");
+      //   on récupère la position de la liste a supp
+      const positionToDel = await List.findByPk(id, {
+        attributes: ["position"],
+      });
+      // si la position à supp = position max
+      //   alors pas besoin de réduire les position des autres liste
+      if (positionToDel === maxPos) {
+        await List.destroy({
+          where: {
+            id: id,
+          },
+        });
+      } else {
+        await List.increment(
+          {
+            position: -1,
+          },
+          {
+            where: {
+              id: { [Op.ne]: id },
+            },
+          }
+        );
+        await List.destroy({
+          where: {
+            id: id,
+          },
+        });
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .send(error, console.log("Problème d'affichage des listes"));
+    }
+  },
 };
 
 export default listController;

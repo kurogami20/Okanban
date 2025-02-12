@@ -11,4 +11,6 @@ router.get("/list/:id", listController.GetlistId);
 router.post("/list", listController.AddList);
 // patch
 router.patch("/list/modify/:id", listController.ModifyList);
+// delete
+router.delete("/list/delete/:id", listController.DeleteList);
 export default router;
