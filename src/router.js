@@ -10,7 +10,7 @@ router.get("/list/:id", listController.GetlistId);
 // post
 router.post("/list", listController.AddList);
 // patch
-router.patch("/list/modify/:id", listController.ModifyList);
+router.patch("/list/:id", listController.ModifyList);
 // delete
-router.delete("/list/delete/:id", listController.DeleteList);
+router.delete("/list/:id", listController.DeleteList);
 export default router;
