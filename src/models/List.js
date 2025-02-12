@@ -7,7 +7,7 @@ List.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.TEXT, allowNull: false },
-    position: { type: DataTypes.INTEGER },
+    position: { type: DataTypes.INTEGER, defaultValue: 0 },
   },
   {
     sequelize,

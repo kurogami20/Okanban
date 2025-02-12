@@ -9,8 +9,8 @@ Card.init(
     name: { type: DataTypes.TEXT, allowNull: false },
     id_list: { type: DataTypes.INTEGER, allowNull: false },
     content: { type: DataTypes.TEXT },
-    position: { type: DataTypes.INTEGER },
-    color: { type: DataTypes.TEXT },
+    position: { type: DataTypes.INTEGER, defaultValue: 0 },
+    color: { type: DataTypes.STRING(7), defaultValue: "#353535" },
   },
   {
     sequelize,

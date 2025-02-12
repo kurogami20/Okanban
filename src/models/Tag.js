@@ -7,7 +7,7 @@ Tag.init(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.TEXT, allowNull: false },
-    color: { type: DataTypes.TEXT },
+    color: { type: DataTypes.STRING(7), defaultValue: "#62009d" },
   },
   {
     sequelize,
