@@ -1,12 +1,14 @@
 import express from "express";
-import { Card } from "./models/index.js";
+import listController from "./controllers/listController.js";
 
 const router = express();
-
-router.get("/list", async function list(req, res) {
-  const cards = await Card.findAll();
-
-  res.json(cards);
-});
-
+// *route pour les listes
+// get simple
+router.get("/list", listController.Getlist);
+// get by id
+router.get("/list/:id", listController.GetlistId);
+// post
+router.post("/list", listController.AddList);
+// patch
+router.patch("/list/modify/:id", listController.ModifyList);
 export default router;

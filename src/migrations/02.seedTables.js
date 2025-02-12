@@ -1,4 +1,4 @@
-import { Card, List, Tag, CardHasTag } from "../models/index.js";
+import { Card, List, Tag, CardHasTag, sequelize } from "../models/index.js";
 
 async function seedTables() {
   const lists = await List.bulkCreate(
@@ -129,7 +129,7 @@ async function seedTables() {
   );
 
   // Update sequences (this is handled automatically by Sequelize)
+  await sequelize.close();
 }
 
 seedTables();
-await sequelize.close();
