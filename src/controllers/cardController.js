@@ -19,7 +19,7 @@ const cardController = {
     res.json(allCard);
   },
   async GetcardId(req, res) {
-    const { id } = idParamsSchema.parse(req.params.id);
+    const { id } = idParamsSchema.parse({ id: req.params.id });
     console.log(id);
     const allCard = await Card.findByPk(id, {
       include: [
@@ -84,7 +84,7 @@ const cardController = {
       position: z.number().int().positive().optional(),
     });
     const newCard = req.body;
-    const { id } = idParamsSchema.parse(req.params.id);
+    const { id } = idParamsSchema.parse({ id: req.params.id });
     const test = cardSchema.safeParse(newCard);
 
     if (!test.success) {
@@ -170,7 +170,7 @@ const cardController = {
     }
   },
   async Deletecard(req, res) {
-    const { id } = idParamsSchema.parse(req.params.id);
+    const { id } = idParamsSchema.parse({ id: req.params.id });
     const card = await Card.findByPk(id);
 
     // on recup la position maximale

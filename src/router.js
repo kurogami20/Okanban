@@ -3,30 +3,35 @@ import listController from "./controllers/listController.js";
 import cardController from "./controllers/cardController.js";
 import { controllerWrapper as cw } from "./utils/controllerWrapper.js";
 
-const router = express();
+const router = express.Router();
 
-// *route pour les listes
-// get simple
-router.get("/list", cw(listController.Getlist));
-// get by id
-router.get("/list/:id", cw(listController.GetlistId));
-// post
-router.post("/list", cw(listController.AddList));
-// patch
-router.patch("/list/:id", cw(listController.ModifyList));
-// delete
-router.delete("/list/:id", cw(listController.DeleteList));
+// *routes pour les listes
+function list() {
+  // get simple
+  router.get("/api/v1/list", cw(listController.Getlist));
+  // get by id
+  router.get("/api/v1/list/:id", cw(listController.GetlistId));
+  // post
+  router.post("/api/v1/list", cw(listController.AddList));
+  // patch
+  router.patch("/api/v1/list/:id", cw(listController.ModifyList));
+  // delete
+  router.delete("/api/v1/list/:id", cw(listController.DeleteList));
+}
+list();
 
-// *route pour les cartes
-// get simple
-router.get("/card", cw(cardController.Getcard));
-// get by id
-router.get("/card/:id", cw(cardController.GetcardId));
-// post
-router.post("/card", cw(cardController.Addcard));
-// patch
-router.patch("/card/:id", cw(cardController.Modifycard));
-// delete
-router.delete("/card/:id", cw(cardController.Deletecard));
-
+// *routes pour les cartes
+function card() {
+  // get simple
+  router.get("/api/v1/card", cw(cardController.Getcard));
+  // get by id
+  router.get("/api/v1/card/:id", cw(cardController.GetcardId));
+  // post
+  router.post("/api/v1/card", cw(cardController.Addcard));
+  // patch
+  router.patch("/api/v1/card/:id", cw(cardController.Modifycard));
+  // delete
+  router.delete("/api/v1/card/:id", cw(cardController.Deletecard));
+}
+card();
 export default router;

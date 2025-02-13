@@ -15,7 +15,7 @@ const listController = {
     }
   },
   async GetlistId(req, res) {
-    const { id } = idParamsSchema.parse(req.params.id);
+    const { id } = idParamsSchema.parse({ id: req.params.id });
 
     const list = await List.findByPk(id);
     if (!list) {
@@ -50,7 +50,7 @@ const listController = {
   },
 
   async ModifyList(req, res) {
-    const { id } = idParamsSchema.parse(req.params.id);
+    const { id } = idParamsSchema.parse({ id: req.params.id });
 
     const newData = req.body;
 
@@ -130,7 +130,7 @@ const listController = {
   },
 
   async DeleteList(req, res) {
-    const { id } = idParamsSchema.parse(req.params.id);
+    const { id } = idParamsSchema.parse({ id: req.params.id });
 
     // on recup la position maximale
     const maxPos = await List.max("position");

@@ -1,4 +1,5 @@
 import { ZodError } from "zod";
+import HttpError from "../utils/errors.js";
 
 export function errorHandler(err, req, res, next) {
   if (err instanceof ZodError) {
