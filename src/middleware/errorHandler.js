@@ -6,8 +6,15 @@ export function errorHandler(err, req, res, next) {
       message: "validation error",
       detail: err,
     });
+    return;
   }
-
+  if (err instanceof HttpError) {
+    res.status(err.status).json({
+      message: err.message,
+      detail: err,
+    });
+    return;
+  }
   console.error(err);
   res.status(500).send("Something did not go right ");
 }

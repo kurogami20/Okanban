@@ -20,7 +20,7 @@ const cardController = {
   },
   async GetcardId(req, res) {
     const { id } = idParamsSchema.parse(req.params.id);
-
+    console.log(id);
     const allCard = await Card.findByPk(id, {
       include: [
         {
@@ -31,6 +31,10 @@ const cardController = {
         },
       ],
     });
+    if (!allCard) {
+      throw new HttpError(404, "card not found");
+    }
+
     res.json(allCard);
   },
   async Addcard(req, res) {
@@ -93,7 +97,7 @@ const cardController = {
         attributes: ["position"],
       });
       if (!positionBase) {
-        res.status(404).send("card not found");
+        throw new HttpError(404, "card not found");
       }
 
       if (newCard.position !== positionBase || newCard.position === undefined) {
@@ -177,6 +181,9 @@ const cardController = {
     const positionToDel = await Card.findByPk(id, {
       attributes: ["position"],
     });
+    if (!positionToDel) {
+      throw new HttpError(404, "card not found");
+    }
     // si la position à supp = position max
     //   alors pas besoin de réduire les position des autres liste
     if (positionToDel === maxPos) {

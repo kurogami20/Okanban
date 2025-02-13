@@ -1,7 +1,7 @@
 import express from "express";
 import listController from "./controllers/listController.js";
 import cardController from "./controllers/cardController.js";
-import { controllerWrapper as cw } from "./schemas/controllerWrapper.js";
+import { controllerWrapper as cw } from "./utils/controllerWrapper.js";
 
 const router = express();
 

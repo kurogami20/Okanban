@@ -18,6 +18,9 @@ const listController = {
     const { id } = idParamsSchema.parse(req.params.id);
 
     const list = await List.findByPk(id);
+    if (!list) {
+      throw new HttpError(404, "list not found");
+    }
     res.json(list);
   },
 
@@ -69,7 +72,7 @@ const listController = {
         attributes: ["position"],
       });
       if (!positionBase) {
-        res.status(404).send("list not found");
+        throw new HttpError(404, "list not found");
       }
 
       const { name, position } = req.body;
@@ -135,6 +138,9 @@ const listController = {
     const positionToDel = await List.findByPk(id, {
       attributes: ["position"],
     });
+    if (!positionToDel) {
+      throw new HttpError(404, "list not found");
+    }
     // si la position à supp = position max
     //   alors pas besoin de réduire les position des autres liste
     if (positionToDel === maxPos) {
