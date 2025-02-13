@@ -1,6 +1,7 @@
 import express from "express";
 import listController from "./controllers/listController.js";
 import cardController from "./controllers/cardController.js";
+import tagController from "./controllers/tagController.js";
 import { controllerWrapper as cw } from "./utils/controllerWrapper.js";
 
 const router = express.Router();
@@ -34,4 +35,19 @@ function card() {
   router.delete("/api/v1/card/:id", cw(cardController.Deletecard));
 }
 card();
+
+// *routes pour les labels
+function tag() {
+  // get simple
+  router.get("/api/v1/tag", cw(tagController.Gettag));
+  // get by id
+  router.get("/api/v1/tag/:id", cw(tagController.GettagId));
+  // post
+  router.post("/api/v1/tag", cw(tagController.Addtag));
+  // patch
+  router.patch("/api/v1/tag/:id", cw(tagController.Modifytag));
+  // delete
+  router.delete("/api/v1/tag/:id", cw(tagController.Deletetag));
+}
+tag();
 export default router;

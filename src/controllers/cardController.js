@@ -1,36 +1,20 @@
 import { Op } from "sequelize";
-import { Card, CardHasTag, Tag, List } from "../models/index.js";
+import { Card, CardHasTag } from "../models/index.js";
 import z from "zod";
 import { idParamsSchema } from "../schemas/utils.js";
+import HttpError from "../utils/errors.js";
 
 const cardController = {
   async Getcard(req, res) {
     const allCard = await Card.findAll({
-      order: [["id_list"]],
-      include: [
-        {
-          association: "list",
-        },
-        {
-          association: "tag",
-        },
-      ],
+      order: [["id"]],
     });
     res.json(allCard);
   },
   async GetcardId(req, res) {
     const { id } = idParamsSchema.parse({ id: req.params.id });
     console.log(id);
-    const allCard = await Card.findByPk(id, {
-      include: [
-        {
-          association: "list",
-        },
-        {
-          association: "tag",
-        },
-      ],
-    });
+    const allCard = await Card.findByPk(id);
     if (!allCard) {
       throw new HttpError(404, "card not found");
     }
@@ -43,7 +27,7 @@ const cardController = {
       name: z.string().min(1),
       content: z.string().optional(),
       color: z.string().max(7).optional(),
-      tag: z.number().optional(),
+      tag: z.number().int().positive().array().optional(),
     });
     const newCard = req.body;
 
@@ -67,9 +51,11 @@ const cardController = {
       if (newCard.tag !== undefined || "") {
         const newCardId = await Card.max("id");
         //   si il y a tag on ajoute l'association
-        await CardHasTag.create({
-          id_card: newCardId,
-          id_tag: newCard.tag,
+        newCard.tag.forEach(async (id, i) => {
+          await CardHasTag.create({
+            id_card: newCardId,
+            id_tag: id,
+          });
         });
       }
     }
@@ -80,7 +66,7 @@ const cardController = {
       name: z.string().min(1).optional(),
       content: z.string().optional(),
       color: z.string().max(7).optional(),
-      tag: z.number().int().positive().optional(),
+      tag: z.number().int().positive().array().optional(),
       position: z.number().int().positive().optional(),
     });
     const newCard = req.body;
@@ -117,14 +103,12 @@ const cardController = {
             where: { id_card: id },
           });
         } else {
-          await CardHasTag.update(
-            {
-              id_tag: newCard.tag,
-            },
-            {
+          newCard.tag.forEach(async (id, i) => {
+            await CardHasTag.update({
               where: { id_card: id },
-            }
-          );
+              id_tag: id,
+            });
+          });
         }
         async function updatePosition() {
           const listCardPosition = await Card.max("position", {

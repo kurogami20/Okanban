@@ -2,12 +2,13 @@ import { Op } from "sequelize";
 import { List } from "../models/index.js";
 import z from "zod";
 import { idParamsSchema } from "../schemas/utils.js";
+import HttpError from "../utils/errors.js";
 
 const listController = {
   async Getlist(req, res) {
     try {
       const lists = await List.findAll({
-        order: [["position"]],
+        order: [["id"]],
       });
       res.json(lists);
     } catch (error) {
@@ -26,7 +27,9 @@ const listController = {
 
   async AddList(req, res) {
     const listSchema = z.object({
+      id_list: z.number.int().positive().optional,
       name: z.string().min(1, "veuillez au moins mettre un caractère"),
+      position: z.number.int().positive().optional,
     });
     try {
       const list = await List.max("id");
