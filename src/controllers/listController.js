@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import { List } from "../models/index.js";
 import z from "zod";
+import { idParamsSchema } from "../schemas/utils.js";
 
 const listController = {
   async Getlist(req, res) {
@@ -14,12 +15,10 @@ const listController = {
     }
   },
   async GetlistId(req, res) {
-    try {
-      const list = await List.findByPk(Number.parseInt(req.params.id));
-      res.json(list);
-    } catch (error) {
-      res.status(500).send(console.log("Problème d'affichage de la liste"));
-    }
+    const { id } = idParamsSchema.parse(req.params.id);
+
+    const list = await List.findByPk(id);
+    res.json(list);
   },
 
   async AddList(req, res) {
@@ -33,6 +32,7 @@ const listController = {
       const zTest = listSchema.safeParse(newList);
       if (!zTest.success) {
         // handle error then return
+        res.status(400).send("erreur");
         console.log(zTest.error);
       } else {
         // do something
@@ -47,13 +47,16 @@ const listController = {
   },
 
   async ModifyList(req, res) {
-    const id = Number.parseInt(req.params.id);
+    const { id } = idParamsSchema.parse(req.params.id);
 
     const newData = req.body;
 
     const listSchema = z.object({
-      name: z.string().min(1, "veuillez au moins mettre un caractère"),
-      position: z.number().optional(),
+      name: z
+        .string()
+        .min(1, "veuillez au moins mettre un caractère")
+        .optional(),
+      position: z.number().int().positive().optional(),
     });
 
     const test = listSchema.safeParse(newData);
@@ -62,24 +65,28 @@ const listController = {
       // handle error then return
       test.error;
     } else {
-      try {
-        const positionBase = await List.findByPk(id, {
-          attributes: ["position"],
-        });
+      const positionBase = await List.findByPk(id, {
+        attributes: ["position"],
+      });
+      if (!positionBase) {
+        res.status(404).send("list not found");
+      }
 
-        const { name, position } = req.body;
-        console.log(position);
-        if (position !== positionBase || position === undefined) {
-          // on met à jour avec la nouvelle position
-          await List.update(
-            {
-              name,
-              position,
-            },
-            { where: { id: id } }
-          );
-          // on change la position des listes qui se retrouve "en-dessous" en ignorant
-          //   la liste que je viens de ùettre à jour
+      const { name, position } = req.body;
+      console.log(position);
+      if (position !== positionBase || position === undefined) {
+        // on met à jour avec la nouvelle position
+        const list = await List.update(
+          {
+            name,
+            position,
+          },
+          { where: { id: id } },
+          { returning: true }
+        );
+        // on change la position des listes qui se retrouve "en-dessous" en ignorant
+        //   la liste que je viens de ùettre à jour
+        async function updatePosition() {
           const max_position = await List.max("position");
           await List.increment(
             {
@@ -102,60 +109,56 @@ const listController = {
               },
             }
           );
-        } else {
-          // on met à jour avec l'ancienne position
-          await List.update(
-            {
-              name,
-              position: positionBase,
-            },
-            { where: { id: id } }
-          );
         }
-      } catch (error) {
-        res.status(500).send(console.log("Problème d'affichage des listes"));
+        updatePosition();
+
+        res.json(list);
+      } else {
+        // on met à jour avec l'ancienne position
+        await List.update(
+          {
+            name,
+            position: positionBase,
+          },
+          { where: { id: id } }
+        );
       }
     }
   },
 
   async DeleteList(req, res) {
-    const id = Number.parseInt(req.params.id);
-    try {
-      // on recup la position maximale
-      const maxPos = await List.max("position");
-      //   on récupère la position de la liste a supp
-      const positionToDel = await List.findByPk(id, {
-        attributes: ["position"],
+    const { id } = idParamsSchema.parse(req.params.id);
+
+    // on recup la position maximale
+    const maxPos = await List.max("position");
+    //   on récupère la position de la liste a supp
+    const positionToDel = await List.findByPk(id, {
+      attributes: ["position"],
+    });
+    // si la position à supp = position max
+    //   alors pas besoin de réduire les position des autres liste
+    if (positionToDel === maxPos) {
+      await List.destroy({
+        where: {
+          id: id,
+        },
       });
-      // si la position à supp = position max
-      //   alors pas besoin de réduire les position des autres liste
-      if (positionToDel === maxPos) {
-        await List.destroy({
+    } else {
+      await List.increment(
+        {
+          position: -1,
+        },
+        {
           where: {
-            id: id,
+            id: { [Op.ne]: id },
           },
-        });
-      } else {
-        await List.increment(
-          {
-            position: -1,
-          },
-          {
-            where: {
-              id: { [Op.ne]: id },
-            },
-          }
-        );
-        await List.destroy({
-          where: {
-            id: id,
-          },
-        });
-      }
-    } catch (error) {
-      res
-        .status(500)
-        .send(error, console.log("Problème d'affichage des listes"));
+        }
+      );
+      await List.destroy({
+        where: {
+          id: id,
+        },
+      });
     }
   },
 };

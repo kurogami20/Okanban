@@ -1,31 +1,32 @@
 import express from "express";
 import listController from "./controllers/listController.js";
 import cardController from "./controllers/cardController.js";
+import { controllerWrapper as cw } from "./schemas/controllerWrapper.js";
 
 const router = express();
 
 // *route pour les listes
 // get simple
-router.get("/list", listController.Getlist);
+router.get("/list", cw(listController.Getlist));
 // get by id
-router.get("/list/:id", listController.GetlistId);
+router.get("/list/:id", cw(listController.GetlistId));
 // post
-router.post("/list", listController.AddList);
+router.post("/list", cw(listController.AddList));
 // patch
-router.patch("/list/:id", listController.ModifyList);
+router.patch("/list/:id", cw(listController.ModifyList));
 // delete
-router.delete("/list/:id", listController.DeleteList);
+router.delete("/list/:id", cw(listController.DeleteList));
 
 // *route pour les cartes
 // get simple
-router.get("/card", cardController.Getcard);
+router.get("/card", cw(cardController.Getcard));
 // get by id
-router.get("/card/:id", cardController.GetcardId);
+router.get("/card/:id", cw(cardController.GetcardId));
 // post
-router.post("/card", cardController.Addcard);
+router.post("/card", cw(cardController.Addcard));
 // patch
-router.patch("/card/:id", cardController.Modifycard);
+router.patch("/card/:id", cw(cardController.Modifycard));
 // delete
-router.delete("/card/:id", cardController.Deletecard);
+router.delete("/card/:id", cw(cardController.Deletecard));
 
 export default router;
