@@ -127,7 +127,7 @@ const cardController = {
               });
             });
           }
-          if (positionBase.position > position) {
+          if (positionBase.position > newCard.position) {
             await List.increment(
               {
                 position: 1,
@@ -142,7 +142,7 @@ const cardController = {
               }
             );
           } else {
-            await List.increment(
+            await Card.increment(
               {
                 position: -1,
               },
@@ -195,8 +195,8 @@ const cardController = {
               });
             });
           }
-          if (positionBase.position > position) {
-            await List.increment(
+          if (positionBase.position > newCard.position) {
+            await Card.increment(
               {
                 position: 1,
               },
