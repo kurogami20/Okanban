@@ -27,6 +27,8 @@ function card() {
   router.get("/api/v1/card", cw(cardController.Getcard));
   // get by id
   router.get("/api/v1/card/:id", cw(cardController.GetcardId));
+  // get by listid
+  router.get("/api/v1/card/list/:id", cw(cardController.GetcardByList));
   // post
   router.post("/api/v1/card", cw(cardController.Addcard));
   // patch

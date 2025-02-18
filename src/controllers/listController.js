@@ -27,9 +27,8 @@ const listController = {
 
   async AddList(req, res) {
     const listSchema = z.object({
-      id_list: z.number.int().positive().optional,
       name: z.string().min(1, "veuillez au moins mettre un caractère"),
-      position: z.number.int().positive().optional,
+      position: z.number().int().positive().optional(),
     });
     try {
       const list = await List.max("id");

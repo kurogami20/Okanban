@@ -21,6 +21,18 @@ const cardController = {
 
     res.json(allCard);
   },
+
+  async GetcardByList(req, res) {
+    const { id } = idParamsSchema.parse({ id: req.params.id });
+    console.log(id);
+    const allCard = await Card.findAll({ where: { id_list: id } });
+    if (!allCard) {
+      throw new HttpError(404, "cards not found");
+    }
+
+    res.json(allCard);
+  },
+
   async Addcard(req, res) {
     const cardSchema = z.object({
       id_list: z.number().min(1),
