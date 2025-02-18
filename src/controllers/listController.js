@@ -8,7 +8,7 @@ const listController = {
   async Getlist(req, res) {
     try {
       const lists = await List.findAll({
-        order: [["id"]],
+        order: [["position"]],
       });
       res.json(lists);
     } catch (error) {
@@ -31,20 +31,39 @@ const listController = {
       position: z.number().int().positive().optional(),
     });
     try {
-      const list = await List.max("id");
+      const maxPosition = await List.max("position");
       const newList = req.body;
 
       const zTest = listSchema.safeParse(newList);
       if (!zTest.success) {
         // handle error then return
         res.status(400).send("erreur");
-        console.log(zTest.error);
       } else {
-        // do something
-        await List.create({
-          name: newList.name,
-          position: list + 1,
-        });
+        console.log(newList.position);
+        if (newList.position === undefined) {
+          // do something
+          await List.create({
+            name: newList.name,
+            position: maxPosition + 1,
+          });
+        } else {
+          await List.increment(
+            {
+              position: 1,
+            },
+            {
+              where: {
+                position: {
+                  [Op.gte]: newList.position,
+                },
+              },
+            }
+          );
+
+          await List.create({
+            ...newList,
+          });
+        }
       }
     } catch (error) {
       res.status(500).send(console.log("Problème d'affichage de la liste"));
@@ -73,13 +92,43 @@ const listController = {
       const positionBase = await List.findByPk(id, {
         attributes: ["position"],
       });
-      if (!positionBase) {
+      if (!positionBase && positionBase.position !== 0) {
         throw new HttpError(404, "list not found");
       }
 
       const { name, position } = req.body;
       console.log(position);
-      if (position !== positionBase || position === undefined) {
+      if (position !== positionBase.position || position === undefined) {
+        // on change la position des listes qui se retrouve "en-dessous" en ignorant
+        //   la liste que je viens de ùettre à jour
+        if (positionBase.position > position) {
+          await List.increment(
+            {
+              position: 1,
+            },
+            {
+              where: {
+                position: {
+                  [Op.between]: [position, positionBase.position - 1],
+                },
+              },
+            }
+          );
+        } else {
+          await List.increment(
+            {
+              position: -1,
+            },
+            {
+              where: {
+                position: {
+                  [Op.between]: [positionBase.position + 1, position],
+                },
+              },
+            }
+          );
+        }
+
         // on met à jour avec la nouvelle position
         const list = await List.update(
           {
@@ -89,34 +138,6 @@ const listController = {
           { where: { id: id } },
           { returning: true }
         );
-        // on change la position des listes qui se retrouve "en-dessous" en ignorant
-        //   la liste que je viens de ùettre à jour
-        async function updatePosition() {
-          const max_position = await List.max("position");
-          await List.increment(
-            {
-              position: 1,
-            },
-            {
-              where: {
-                position: { [Op.between]: [position, max_position] },
-              },
-            }
-          );
-
-          await List.increment(
-            {
-              position: -1,
-            },
-            {
-              where: {
-                id: id,
-              },
-            }
-          );
-        }
-        updatePosition();
-
         res.json(list);
       } else {
         // on met à jour avec l'ancienne position
@@ -140,12 +161,14 @@ const listController = {
     const positionToDel = await List.findByPk(id, {
       attributes: ["position"],
     });
-    if (!positionToDel) {
+    console.log(maxPos);
+    console.log(positionToDel.position);
+    if (!positionToDel.position && positionToDel.position !== 0) {
       throw new HttpError(404, "list not found");
     }
     // si la position à supp = position max
     //   alors pas besoin de réduire les position des autres liste
-    if (positionToDel === maxPos) {
+    if (positionToDel.position === maxPos) {
       await List.destroy({
         where: {
           id: id,
@@ -158,7 +181,7 @@ const listController = {
         },
         {
           where: {
-            id: { [Op.ne]: id },
+            position: { [Op.gt]: positionToDel.position },
           },
         }
       );
