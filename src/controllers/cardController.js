@@ -7,7 +7,7 @@ import HttpError from "../utils/errors.js";
 const cardController = {
   async Getcard(req, res) {
     const allCard = await Card.findAll({
-      order: [["id"]],
+      order: [["position"]],
     });
     res.json(allCard);
   },
@@ -25,12 +25,11 @@ const cardController = {
   async GetcardByList(req, res) {
     const { id } = idParamsSchema.parse({ id: req.params.id });
     console.log(id);
-    const allCard = await Card.findAll(
-      {
-        order: [["position"]],
-      },
-      { where: { id_list: id } }
-    );
+    const allCard = await Card.findAll({
+      order: [["position"]],
+
+      where: { id_list: id },
+    });
     if (!allCard) {
       throw new HttpError(404, "cards not found");
     }
