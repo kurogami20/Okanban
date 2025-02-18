@@ -25,7 +25,12 @@ const cardController = {
   async GetcardByList(req, res) {
     const { id } = idParamsSchema.parse({ id: req.params.id });
     console.log(id);
-    const allCard = await Card.findAll({ where: { id_list: id } });
+    const allCard = await Card.findAll(
+      {
+        order: [["position"]],
+      },
+      { where: { id_list: id } }
+    );
     if (!allCard) {
       throw new HttpError(404, "cards not found");
     }
@@ -98,70 +103,149 @@ const cardController = {
         throw new HttpError(404, "card not found");
       }
 
-      if (newCard.position !== positionBase || newCard.position === undefined) {
-        // on met à jour avec la nouvelle position
-        const card = await Card.update(
-          {
-            ...newCard,
-          },
-          {
-            where: { id: id },
-            returning: true,
-          }
-        );
-        // on vérifie si un tag n'a  pas été associé
-        if (newCard.tag === undefined || "") {
-          await CardHasTag.destroy({
-            where: { id_card: id },
-          });
-        } else {
-          newCard.tag.forEach(async (id, i) => {
-            await CardHasTag.update({
+      const idList = await Card.findByPk(id, {
+        attributes: ["id_list"],
+      });
+
+      if (
+        (idList.id_list !== newCard.id_list && newCard.id_list !== undefined) ||
+        ""
+      ) {
+        if (
+          newCard.position !== positionBase.position ||
+          newCard.position === undefined
+        ) {
+          // on vérifie si un tag n'a  pas été associé
+          if (newCard.tag === undefined || "") {
+            await CardHasTag.destroy({
               where: { id_card: id },
-              id_tag: id,
             });
-          });
-        }
-        async function updatePosition() {
-          const listCardPosition = await Card.max("position", {
-            where: { id_list: newCard.id_list },
-          });
-          await Card.increment(
-            {
-              position: 1,
-            },
-            {
-              where: {
-                position: {
-                  [Op.between]: [newCard.position, listCardPosition],
+          } else {
+            newCard.tag.forEach(async (id, i) => {
+              await CardHasTag.update({
+                where: { id_card: id },
+                id_tag: id,
+              });
+            });
+          }
+          if (positionBase.position > position) {
+            await List.increment(
+              {
+                position: 1,
+              },
+              {
+                where: {
+                  position: {
+                    [Op.between]: [newCard.position, positionBase.position - 1],
+                  },
+                  id_list: newCard.id_list,
                 },
+              }
+            );
+          } else {
+            await List.increment(
+              {
+                position: -1,
               },
-            }
-          );
-
-          await Card.increment(
+              {
+                where: {
+                  position: {
+                    [Op.between]: [positionBase.position + 1, newCard.position],
+                  },
+                  id_list: newCard.id_list,
+                },
+              }
+            );
+          }
+          // on met à jour avec la nouvelle position
+          const card = await Card.update(
             {
-              position: -1,
+              ...newCard,
             },
             {
-              where: {
-                id: id,
-              },
+              where: { id: id },
+              returning: true,
             }
           );
+          res.json(card);
+        } else {
+          // on met à jour avec l'ancienne position
+          await Card.update(
+            {
+              name: newCard.name,
+              position: positionBase,
+            },
+            { where: { id: id } }
+          );
         }
-        updatePosition();
-
-        res.json(card);
       } else {
-        // on met à jour avec l'ancienne position
-        await Card.update(
-          {
-            name,
-            position: positionBase,
-          },
-          { where: { id: id } }
-        );
+        if (
+          newCard.position !== positionBase.position ||
+          newCard.position === undefined
+        ) {
+          // on vérifie si un tag n'a  pas été associé
+          if (newCard.tag === undefined || "") {
+            await CardHasTag.destroy({
+              where: { id_card: id },
+            });
+          } else {
+            newCard.tag.forEach(async (id, i) => {
+              await CardHasTag.update({
+                where: { id_card: id },
+                id_tag: id,
+              });
+            });
+          }
+          if (positionBase.position > position) {
+            await List.increment(
+              {
+                position: 1,
+              },
+              {
+                where: {
+                  position: {
+                    [Op.between]: [newCard.position, positionBase.position - 1],
+                  },
+                  id_list: idList.id_list,
+                },
+              }
+            );
+          } else {
+            await List.increment(
+              {
+                position: -1,
+              },
+              {
+                where: {
+                  position: {
+                    [Op.between]: [positionBase.position + 1, newCard.position],
+                  },
+                  id_list: idList.id_list,
+                },
+              }
+            );
+          }
+          // on met à jour avec la nouvelle position
+          const card = await Card.update(
+            {
+              ...newCard,
+            },
+            {
+              where: { id: id },
+              returning: true,
+            }
+          );
+          res.json(card);
+        } else {
+          // on met à jour avec l'ancienne position
+          await Card.update(
+            {
+              name: newCard.name,
+              position: positionBase,
+            },
+            { where: { id: id } }
+          );
+        }
       }
     }
   },
@@ -182,7 +266,7 @@ const cardController = {
     }
     // si la position à supp = position max
     //   alors pas besoin de réduire les position des autres liste
-    if (positionToDel === maxPos) {
+    if (positionToDel.position === maxPos) {
       await Card.destroy({
         where: {
           id: id,
@@ -195,7 +279,7 @@ const cardController = {
         },
         {
           where: {
-            id: { [Op.ne]: id },
+            position: { [Op.gt]: positionToDel.position },
           },
         }
       );
