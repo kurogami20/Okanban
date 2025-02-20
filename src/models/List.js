@@ -10,9 +10,7 @@ List.init(
     position: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
-      validate: {
-        min: 0, // Empêche les valeurs négatives
-      },
+      
     },
   },
   {

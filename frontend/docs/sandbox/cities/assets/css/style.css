@@ -1,0 +1,14 @@
+.cities {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cities__item {
+  font-weight: bold;
+  color: #f0f;
+}
+
+.cities__item--active {
+  color: #0f0;
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Title -->
+    <title>oKanban</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='24px' height='24px' stroke-width='1.5' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg' color='%23000000'%3E%3Cpath d='M3 3.6V20.4C3 20.7314 3.26863 21 3.6 21H20.4C20.7314 21 21 20.7314 21 20.4V3.6C21 3.26863 20.7314 3 20.4 3H3.6C3.26863 3 3 3.26863 3 3.6Z' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3Cpath d='M6 6L6 16' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3Cpath d='M10 6V9' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3Cpath d='M14 6V13' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3Cpath d='M18 6V11' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E">
+
+    <!-- Bulma -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom CSS-->
+    <link rel="stylesheet" href="./assets/css/style.css">
+<!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script> -->
+    <!-- Custom JS -->
+    <script defer src="./assets/js/app.js" type="module"></script>
+</head>
+
+<template id="list_template">
+<!-- List -->
+<section slot="list_id" class="message is-info list_template-item">
+<div class="message-header">
+<div class="list_title"></div>
+
+
+<div class="dropdown is-right">
+  <div class="dropdown-trigger">
+    <button class="button listModifBtn" aria-haspopup="true" aria-controls="dropdown-menu">
+     <span class="icon is-clickable"><i class="fa-solid fa-ellipsis"></i></span>
+      
+    </button>
+  </div>
+  <div class="dropdown-menu" id="dropdown-menu" role="menu">
+    <div class="dropdown-content">
+    <button  class="dropdown-item modify-dropdown">Modifier </button>
+      <hr class="dropdown-divider" />
+      <button  class="dropdown-item delete-dropdown"> Supprimer </button>
+    </div>
+  </div>
+</div>
+</div>
+<div class="message-body">
+  <!-- <button class="button button_plus is-justify-content-center"><span class="icon is-clickable "><i class="fa-solid fa-plus "></i></span></button> -->
+  <article  class="card card_plus">
+<div class=" card-header is-flex-direction-column  is-align-items-center ">
+<span class="icon is-clickable "><i class="fa-solid fa-plus "></i></span>
+</div>
+</article>
+</div>
+</section>
+</template>
+
+<template id="card_template">  <!-- Card -->
+<article class="card">
+<div class="card-header is-flex-direction-column">
+<div class="card-header-title has-text-weight-medium"></div>
+  <div class="card-content"></div>
+<div class="card-header-icon">
+<span class="icon has-text-success"><i class="fas fa-pencil-alt"></i></span>
+<span class="icon has-text-danger ml-2"><i class="fas fa-trash-alt"></i></span>
+</div>
+</div>
+</article>
+</template>
+
+<body class="container is-fluid my-6">
+  <header class="my-5">
+    <h1 class="title has-text-centered is-1">oKanban</h1>
+    <button class="button is-info is-outlined " id="add-list-button"><i class="fas fa-plus mr-2"></i>Ajouter une liste</button>
+
+  </header>
+
+  <main id="lists-container">
+  
+
+  </main>
+
+  <!-- Fenêtre de dialogue pour l'ajout de liste -->
+  <!-- Ajouter l'attribut 'open' ou appeler la méthode 'showModal()' pour voir le contenu -->
+  <dialog id="add-list-modal">
+    <div class="modal is-active">
+      <div class="modal-background close"></div>
+      <div class="modal-card">
+        <form id="form-list">
+          <div class="modal-card-head">
+            <p class="modal-card-title">Ajouter une liste</p>
+            <button class="delete close" type="button" aria-label="close"></button>
+          </div>
+  
+          <div class="modal-card-body">
+            <label for="add-list-title" class="label">Titre</label>
+            <input id="add-list-title" class="input" type="text" name="name" placeholder="Titre de la liste">
+          </div>
+   <div class="modal-card-body">
+            <label for="add-list-title" class="label">Position (optionel)</label>
+            <input id="add-list-position" class="input" type="number" min="1"   name="position" placeholder="Titre de la liste">
+          </div>
+          <div class="modal-card-foot">
+            <div class="buttons">
+              <button class="button is-success" type="submit">Ajouter</button>
+                   <button class="button " type="reset" >Effacer</button>
+              <button class="button close" type="button">Annuler</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+<!-- modifier les listes -->
+<dialog id="modify-list-modal">
+    <div class="modal is-active">
+      <div class="modal-background close"></div>
+      <div class="modal-card">
+        <form id="form-list-updater">
+          <div class="modal-card-head">
+            <p class="modal-card-title">Modifier la liste</p>
+            <button class="delete close" type="button" aria-label="close"></button>
+          </div>
+    
+            <input id="modify-list-id" class="input id" type="hidden" name="id" value="">
+          
+          <div class="modal-card-body">
+            <label for="modify-list-title" class="label">Titre</label>
+            <input id="modify-list-position" class="input" type="text" name="name" placeholder="Titre de la liste">
+          </div>
+   <div class="modal-card-body">
+            <label for="modify-list-position" class="label">Position</label>
+            <input id="modify-list-position" class="input" type="number" min="1" max="" name="position" >
+          </div>
+          <div class="modal-card-foot">
+            <div class="buttons">
+              <button class="button is-success" type="submit">Ajouter</button>
+                   <button class="button " type="reset" >Effacer</button>
+              <button class="button close" type="button">Annuler</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- supprimer les listes -->
+<dialog id="delete-list-modal">
+    <div class="modal is-active">
+      <div class="modal-background close"></div>
+      <div class="modal-card">
+        <form id="form-list-deleter">
+          <div class="modal-card-head">
+            <p class="modal-card-title">Supprimer la liste</p>
+            <button class="delete close" type="button" aria-label="close"></button>
+          </div>
+    
+            <input id="cardIdToDelete" class="input id" type="hidden" name="id" value="">
+          
+  <div class="modal-card-foot"><div class="buttons">
+              <button class="button is-danger" type="submit">Confirmer</button>
+                   
+              <button class="button close" type="button">Annuler</button>
+            </div></div>
+            
+          </div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+</body>
+
+</html>
