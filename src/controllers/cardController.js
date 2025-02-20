@@ -29,6 +29,11 @@ const cardController = {
       order: [["position"]],
 
       where: { id_list: id },
+      include: [
+        {
+          association: "tag",
+        },
+      ],
     });
     if (!allCard) {
       throw new HttpError(404, "cards not found");
